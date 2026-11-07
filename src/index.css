@@ -1,0 +1,19 @@
+/* GLOBAL RESET */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #f5f6fb;
+  color: #20243a;
+}
+
+button,
+input,
+select {
+  font-family: inherit;
+}
