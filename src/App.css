@@ -753,3 +753,279 @@
   }
 }
 
+
+/* =================================
+   ADMIN DASHBOARD DESIGN
+================================= */
+
+.admin-dashboard {
+  width: 100%;
+  max-width: 1400px;
+}
+
+.admin-dashboard .browse-header {
+  margin-bottom: 25px;
+}
+
+.admin-dashboard .browse-header h1 {
+  font-size: 28px;
+  color: #20243a;
+  margin-bottom: 8px;
+}
+
+.admin-dashboard .browse-header p {
+  color: #85899b;
+  font-size: 15px;
+}
+
+/* ADMIN STATISTICS */
+
+.admin-dashboard .stats-grid {
+  margin-bottom: 25px;
+}
+
+/* FORM AND EVENTS SECTIONS */
+
+.admin-form-section,
+.admin-events-section {
+  background: #ffffff;
+  padding: 26px;
+  border: 1px solid #e9eaf1;
+  border-radius: 16px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 15px rgba(30, 35, 70, 0.04);
+}
+
+.admin-form-section h2,
+.admin-events-section h2 {
+  font-size: 20px;
+  color: #20243a;
+  margin-bottom: 22px;
+}
+
+/* FORM GRID */
+
+.admin-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.admin-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+.admin-form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.admin-form-group label {
+  color: #353950;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.admin-form-group input,
+.admin-form-group select,
+.admin-form-group textarea {
+  width: 100%;
+  padding: 13px 14px;
+  border: 1px solid #dedfea;
+  border-radius: 9px;
+  outline: none;
+  background: #ffffff;
+  color: #30344a;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.admin-form-group input:focus,
+.admin-form-group select:focus,
+.admin-form-group textarea:focus {
+  border-color: #6657df;
+  box-shadow: 0 0 0 3px rgba(102, 87, 223, 0.10);
+}
+
+.admin-form-group textarea {
+  min-height: 110px;
+  resize: vertical;
+}
+
+/* FORM BUTTONS */
+
+.admin-form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.admin-form-actions button {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 9px;
+  background: #6657df;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.admin-form-actions button:hover {
+  background: #5142c5;
+  transform: translateY(-1px);
+}
+
+.admin-form-actions .cancel-edit-btn {
+  background: #eeeeF5;
+  color: #4c5065;
+}
+
+.admin-form-actions .cancel-edit-btn:hover {
+  background: #dedfea;
+}
+
+/* MANAGE EVENTS */
+
+.admin-event-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 20px;
+  border: 1px solid #ececf3;
+  border-radius: 12px;
+  margin-bottom: 13px;
+  background: #ffffff;
+  transition: 0.2s;
+}
+
+.admin-event-item:hover {
+  border-color: #c9c2fa;
+  box-shadow: 0 4px 12px rgba(30, 35, 70, 0.05);
+}
+
+.admin-event-item h3 {
+  color: #282c43;
+  font-size: 16px;
+  margin-bottom: 7px;
+}
+
+.admin-event-item p {
+  color: #6657df;
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+
+.admin-event-item small {
+  color: #85899b;
+  font-size: 13px;
+}
+
+/* EDIT AND DELETE BUTTONS */
+
+.admin-event-actions {
+  display: flex;
+  gap: 9px;
+}
+
+.admin-event-actions button {
+  padding: 9px 16px;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.admin-event-actions button:first-child {
+  background: #eeeaff;
+  color: #6657df;
+}
+
+.admin-event-actions button:first-child:hover {
+  background: #ded7ff;
+}
+
+.admin-event-actions button:last-child {
+  background: #fff0f0;
+  color: #dc4545;
+}
+
+.admin-event-actions button:last-child:hover {
+  background: #ffdddd;
+}
+
+/* RESPONSIVE DESIGN */
+
+@media (max-width: 768px) {
+  .admin-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-form-group.full-width {
+    grid-column: auto;
+  }
+
+  .admin-event-item {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .admin-event-actions {
+    width: 100%;
+  }
+}
+
+.attendance-section {
+  margin-top: 25px;
+}
+
+.attendance-event-select {
+  max-width: 450px;
+  margin: 20px 0;
+}
+
+.attendance-summary {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.attendance-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+.attendance-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.attendance-table th,
+.attendance-table td {
+  padding: 14px;
+  border-bottom: 1px solid #ddd;
+}
+
+.attendance-table th {
+  font-weight: 600;
+}
+
+.attendance-table select {
+  padding: 9px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  background: white;
+}
+
+@media (max-width: 768px) {
+  .attendance-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
