@@ -1,65 +1,11 @@
 import { useState } from "react";
 
-function BrowseEvents({ registeredEvents, setRegisteredEvents }) {
+const API_URL = "http://localhost:5000/api";
+
+function BrowseEvents({ events, registeredEvents, setRegisteredEvents, token }) {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
 
-  const events = [
-    {
-      id: 1,
-      title: "IT Week 2026",
-      category: "Technology",
-      date: "November 15, 2026",
-      time: "8:00 AM - 5:00 PM",
-      location: "University Auditorium",
-      description: "A week of technology activities, competitions, and learning.",
-    },
-    {
-      id: 2,
-      title: "Campus Leadership Seminar",
-      category: "Seminar",
-      date: "November 20, 2026",
-      time: "9:00 AM - 12:00 PM",
-      location: "Conference Hall",
-      description: "Develop your leadership and communication skills.",
-    },
-    {
-      id: 3,
-      title: "University Sports Festival",
-      category: "Sports",
-      date: "November 25, 2026",
-      time: "7:00 AM - 5:00 PM",
-      location: "University Gymnasium",
-      description: "Join exciting sports competitions and activities.",
-    },
-    {
-      id: 4,
-      title: "Web Development Workshop",
-      category: "Technology",
-      date: "December 2, 2026",
-      time: "1:00 PM - 4:00 PM",
-      location: "Computer Laboratory",
-      description: "Learn the fundamentals of modern web development.",
-    },
-    {
-      id: 5,
-      title: "Student Organization Fair",
-      category: "Social",
-      date: "December 5, 2026",
-      time: "8:00 AM - 3:00 PM",
-      location: "University Grounds",
-      description: "Discover student organizations and campus communities.",
-    },
-    {
-      id: 6,
-      title: "Research Presentation",
-      category: "Academic",
-      date: "December 10, 2026",
-      time: "9:00 AM - 3:00 PM",
-      location: "University Auditorium",
-      description: "Explore research projects presented by students.",
-    },
-  ];
 
   const categories = [
     "All",
@@ -80,15 +26,37 @@ function BrowseEvents({ registeredEvents, setRegisteredEvents }) {
     return matchesSearch && matchesCategory;
   });
 
-  const handleRegistration = (eventId) => {
-    if (registeredEvents.includes(eventId)) {
-      setRegisteredEvents(
-        registeredEvents.filter((id) => id !== eventId)
-      );
-    } else {
-      setRegisteredEvents([...registeredEvents, eventId]);
+
+const handleRegistration = async (eventId) => {
+  if (registeredEvents.includes(eventId)) {
+    alert("You are already registered for this event.");
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_URL}/registrations`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ eventId }),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || "Registration failed.");
     }
-  };
+
+    setRegisteredEvents((previous) => [...previous, eventId]);
+
+    alert("Event registration successful!");
+  } catch (error) {
+    alert(error.message);
+  }
+};
+
 
   return (
     <div className="browse-events">
@@ -164,9 +132,10 @@ function BrowseEvents({ registeredEvents, setRegisteredEvents }) {
                   registeredEvents.includes(event.id)
                     ? "registered-button"
                     : "register-button"
-                }
+                  }
                 onClick={() => handleRegistration(event.id)}
-              >
+                disabled={registeredEvents.includes(event.id)}
+>
                 {registeredEvents.includes(event.id)
                   ? "✓ Registered"
                   : "Register Now"}
