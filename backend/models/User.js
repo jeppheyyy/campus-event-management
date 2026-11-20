@@ -7,6 +7,7 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
       trim: true,
+      maxlength: 100,
     },
 
     studentId: {
@@ -14,6 +15,7 @@ const userSchema = new mongoose.Schema(
       trim: true,
       unique: true,
       sparse: true,
+      maxlength: 50,
     },
 
     email: {
@@ -22,6 +24,7 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       trim: true,
+      maxlength: 254,
     },
 
     password: {

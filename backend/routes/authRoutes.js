@@ -6,22 +6,61 @@ const User = require("../models/User");
 
 const router = express.Router();
 
-
 // STUDENT REGISTRATION
 router.post("/register", async (req, res) => {
   try {
-    const { name, studentId, email, password } = req.body;
+    const { name, studentId, email, password } = req.body || {};
 
-    // CHECK REQUIRED FIELDS
+    // CHECK REQUIRED FIELDS AND DATA TYPES
     if (
-      !name?.trim() ||
-      !studentId?.trim() ||
-      !email?.trim() ||
+      typeof name !== "string" ||
+      typeof studentId !== "string" ||
+      typeof email !== "string" ||
+      typeof password !== "string" ||
+      !name.trim() ||
+      !studentId.trim() ||
+      !email.trim() ||
       !password
     ) {
       return res.status(400).json({
         success: false,
-        message: "Please complete all fields.",
+        message: "Please complete all fields correctly.",
+      });
+    }
+
+    const normalizedName = name.trim();
+    const normalizedStudentId = studentId.trim();
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // VALIDATE FIELD LENGTHS
+    if (normalizedName.length > 100) {
+      return res.status(400).json({
+        success: false,
+        message: "Name must not exceed 100 characters.",
+      });
+    }
+
+    if (normalizedStudentId.length > 50) {
+      return res.status(400).json({
+        success: false,
+        message: "Student ID must not exceed 50 characters.",
+      });
+    }
+
+    if (normalizedEmail.length > 254) {
+      return res.status(400).json({
+        success: false,
+        message: "Email must not exceed 254 characters.",
+      });
+    }
+
+    // VALIDATE EMAIL FORMAT
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (!emailPattern.test(normalizedEmail)) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter a valid email address.",
       });
     }
 
@@ -33,8 +72,13 @@ router.post("/register", async (req, res) => {
       });
     }
 
-    const normalizedEmail = email.toLowerCase().trim();
-    const normalizedStudentId = studentId.trim();
+    // BCRYPT SUPPORTS PASSWORDS UP TO 72 UTF-8 BYTES
+    if (Buffer.byteLength(password, "utf8") > 72) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must not exceed 72 bytes.",
+      });
+    }
 
     // CHECK EXISTING EMAIL OR STUDENT ID
     const existingUser = await User.findOne({
@@ -59,7 +103,7 @@ router.post("/register", async (req, res) => {
 
     // CREATE STUDENT ACCOUNT
     const newUser = new User({
-      name: name.trim(),
+      name: normalizedName,
       studentId: normalizedStudentId,
       email: normalizedEmail,
       password: hashedPassword,
@@ -68,11 +112,10 @@ router.post("/register", async (req, res) => {
 
     await newUser.save();
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: "Student account created successfully.",
     });
-
   } catch (error) {
     console.error("STUDENT REGISTRATION ERROR:", error);
 
@@ -83,28 +126,49 @@ router.post("/register", async (req, res) => {
       });
     }
 
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message: "Registration failed.",
     });
   }
 });
 
-
 // USER LOGIN
 router.post("/login", async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password } = req.body || {};
 
-    if (!email || !password) {
+    // CHECK REQUIRED FIELDS
+    if (
+      typeof email !== "string" ||
+      typeof password !== "string" ||
+      !email.trim() ||
+      !password
+    ) {
       return res.status(400).json({
         success: false,
         message: "Please enter your email and password.",
       });
     }
 
+    const normalizedEmail = email.trim().toLowerCase();
+
+    // CHECK EMAIL LENGTH AND FORMAT
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    if (
+      normalizedEmail.length > 254 ||
+      !emailPattern.test(normalizedEmail)
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: "Please enter a valid email address.",
+      });
+    }
+
+    // FIND USER
     const user = await User.findOne({
-      email: email.toLowerCase().trim(),
+      email: normalizedEmail,
     });
 
     if (!user) {
@@ -114,6 +178,7 @@ router.post("/login", async (req, res) => {
       });
     }
 
+    // CHECK PASSWORD
     const isPasswordValid = await bcrypt.compare(
       password,
       user.password
@@ -126,6 +191,17 @@ router.post("/login", async (req, res) => {
       });
     }
 
+    // CHECK JWT CONFIGURATION
+    if (!process.env.JWT_SECRET) {
+      console.error("JWT_SECRET is missing from backend configuration.");
+
+      return res.status(500).json({
+        success: false,
+        message: "Server authentication is not configured.",
+      });
+    }
+
+    // GENERATE TOKEN
     const token = jwt.sign(
       {
         id: user._id,
@@ -135,24 +211,24 @@ router.post("/login", async (req, res) => {
       { expiresIn: "1d" }
     );
 
-res.json({
-  success: true,
-  message: "Login successful.",
-  token,
-  user: {
-    id: user._id,
-    name: user.name,
-    studentId: user.studentId,
-    email: user.email,
-    role: user.role,
-  },
-});
-
+    return res.json({
+      success: true,
+      message: "Login successful.",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        studentId: user.studentId,
+        email: user.email,
+        role: user.role,
+      },
+    });
   } catch (error) {
-    res.status(500).json({
+    console.error("USER LOGIN ERROR:", error);
+
+    return res.status(500).json({
       success: false,
       message: "Login failed.",
-      error: error.message,
     });
   }
 });
