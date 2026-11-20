@@ -169,18 +169,47 @@ function MyRegistrations({ setRegisteredEvents, token }) {
 
                 <p>{event.description}</p>
 
-                <div className="registration-status">
-                  <p>
-                    **Attendance:** {event.attendanceStatus || "Not Marked"}
-                  </p>
+                
+<div className="registration-status">
 
-                  <p>
-                    **Event Status:**{" "}
-                    {isPastEvent(event.date)
-                      ? "Event Passed"
-                      : event.status || "Open"}
-                  </p>
-                </div>
+  <div className="status-row">
+    <strong>Attendance</strong>
+
+    <span
+      className={`status-badge ${
+        event.attendanceStatus === "Present"
+          ? "status-present"
+          : event.attendanceStatus === "Absent"
+            ? "status-absent"
+            : "status-not-marked"
+      }`}
+    >
+      {event.attendanceStatus || "Not Marked"}
+    </span>
+  </div>
+
+  <div className="status-row">
+    <strong>Event Status</strong>
+
+    <span
+      className={`status-badge ${
+        isPastEvent(event.date)
+          ? "status-passed"
+          : event.status === "Closed"
+            ? "status-closed"
+            : event.status === "Completed"
+              ? "status-completed"
+              : "status-open"
+      }`}
+    >
+      {isPastEvent(event.date)
+        ? "Event Passed"
+        : event.status || "Open"}
+    </span>
+  </div>
+
+</div>
+
 
                 <div className="browse-info">
                   <span>

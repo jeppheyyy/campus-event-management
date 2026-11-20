@@ -1,6 +1,9 @@
+
 import { useState } from "react";
 
 const API_URL = "http://localhost:5000/api";
+
+// CHECK IF EVENT HAS ALREADY PASSED
 const isPastEvent = (date) => {
   const eventDate = new Date(date);
   const today = new Date();
@@ -11,10 +14,23 @@ const isPastEvent = (date) => {
   return eventDate < today;
 };
 
-function BrowseEvents({ events, registeredEvents, setRegisteredEvents, token }) {
+// FORMAT EVENT DATE
+const formatEventDate = (date) => {
+  return new Date(date).toLocaleDateString("en-PH", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+};
+
+function BrowseEvents({
+  events,
+  registeredEvents,
+  setRegisteredEvents,
+  token,
+}) {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
-
 
   const categories = [
     "All",
@@ -25,55 +41,55 @@ function BrowseEvents({ events, registeredEvents, setRegisteredEvents, token }) 
     "Academic",
   ];
 
-const filteredEvents = events.filter((event) => {
-  const searchText = search.toLowerCase().trim();
+  // SEARCH AND FILTER EVENTS
+  const filteredEvents = events.filter((event) => {
+    const searchText = search.toLowerCase().trim();
 
-  const matchesSearch = [
-    event.title,
-    event.description,
-    event.category,
-    event.location,
-  ].some((value) =>
-    String(value || "").toLowerCase().includes(searchText)
-  );
+    const matchesSearch = [
+      event.title,
+      event.description,
+      event.category,
+      event.location,
+    ].some((value) =>
+      String(value || "").toLowerCase().includes(searchText)
+    );
 
-  const matchesCategory =
-    category === "All" || event.category === category;
+    const matchesCategory =
+      category === "All" || event.category === category;
 
-  return matchesSearch && matchesCategory;
-});
+    return matchesSearch && matchesCategory;
+  });
 
-
-const handleRegistration = async (eventId) => {
-  if (registeredEvents.includes(eventId)) {
-    alert("You are already registered for this event.");
-    return;
-  }
-
-  try {
-    const response = await fetch(`${API_URL}/registrations`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ eventId }),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.message || "Registration failed.");
+  // REGISTER FOR AN EVENT
+  const handleRegistration = async (eventId) => {
+    if (registeredEvents.includes(eventId)) {
+      alert("You are already registered for this event.");
+      return;
     }
 
-    setRegisteredEvents((previous) => [...previous, eventId]);
+    try {
+      const response = await fetch(`${API_URL}/registrations`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ eventId }),
+      });
 
-    alert("Event registration successful!");
-  } catch (error) {
-    alert(error.message);
-  }
-};
+      const data = await response.json();
 
+      if (!response.ok) {
+        throw new Error(data.message || "Registration failed.");
+      }
+
+      setRegisteredEvents((previous) => [...previous, eventId]);
+
+      alert("Event registration successful!");
+    } catch (error) {
+      alert(error.message);
+    }
+  };
 
   return (
     <div className="browse-events">
@@ -95,7 +111,6 @@ const handleRegistration = async (eventId) => {
 
       {/* SEARCH AND FILTER */}
       <div className="event-controls">
-
         <input
           type="text"
           placeholder="Search events..."
@@ -113,7 +128,6 @@ const handleRegistration = async (eventId) => {
             </option>
           ))}
         </select>
-
       </div>
 
       {/* EVENT RESULTS */}
@@ -122,67 +136,88 @@ const handleRegistration = async (eventId) => {
         <p>{filteredEvents.length} event(s) found</p>
       </div>
 
+      {/* EVENT CARDS */}
       <div className="browse-grid">
+        {filteredEvents.map((event) => {
+          const alreadyRegistered = registeredEvents.includes(event.id);
+          const eventPassed = isPastEvent(event.date);
+          const registrationClosed = event.status !== "Open";
 
-        {filteredEvents.map((event) => (
-          <div className="browse-card" key={event.id}>
+          return (
+            <div className="browse-card" key={event.id}>
 
-	<div className="browse-banner">
-  	<span>{event.category}</span>
-  	<div>ðŸŽ“</div>
+              {/* EVENT BANNER */}
+              <div className="browse-banner">
+                <span>{event.category}</span>
 
-  	{isPastEvent(event.date) && (
-    	<span className="event-status">Event Passed</span>
-  	)}
-	</div>
-            <div className="browse-card-content">
+                <div className="browse-banner-icon">
+                  {"\u{1F393}"}
+                </div>
 
-              <h3>{event.title}</h3>
-
-              <p>{event.description}</p>
-
-              <div className="browse-info">
-                <span>📅 {event.date}</span>
-                <span>🕒 {event.time}</span>
-                <span>📍 {event.location}</span>
+                {eventPassed && (
+                  <span className="event-status">
+                    Event Passed
+                  </span>
+                )}
               </div>
 
-<button
-  className={
-    registeredEvents.includes(event.id)
-      ? "registered-button"
-      : "register-button"
-  }
-  onClick={() => handleRegistration(event.id)}
-  disabled={
-    registeredEvents.includes(event.id) ||
-    isPastEvent(event.date) ||
-    event.status !== "Open"
-  }
->
-  {registeredEvents.includes(event.id)
-    ? "Registered"
-    : isPastEvent(event.date)
-      ? "Event Passed"
-      : event.status !== "Open"
-        ? "Registration Closed"
-        : "Register Now"}
-</button>
+              {/* EVENT INFORMATION */}
+              <div className="browse-card-content">
+                <h3>{event.title}</h3>
 
+                <p>{event.description}</p>
+
+                <div className="browse-info">
+                  <span>
+                    {"\u{1F4C5}"} {formatEventDate(event.date)}
+                  </span>
+
+                  <span>
+                    {"\u{1F552}"} {event.time}
+                  </span>
+
+                  <span>
+                    {"\u{1F4CD}"} {event.location}
+                  </span>
+                </div>
+
+                {/* REGISTRATION BUTTON */}
+                <button
+                  className={
+                    alreadyRegistered
+                      ? "registered-button"
+                      : "register-button"
+                  }
+                  onClick={() => handleRegistration(event.id)}
+                  disabled={
+                    alreadyRegistered ||
+                    eventPassed ||
+                    registrationClosed
+                  }
+                >
+                  {alreadyRegistered
+                    ? "Registered"
+                    : eventPassed
+                    ? "Event Passed"
+                    : registrationClosed
+                    ? "Registration Closed"
+                    : "Register Now"}
+                </button>
+              </div>
             </div>
-
-          </div>
-        ))}
-
+          );
+        })}
       </div>
 
+      {/* NO EVENTS FOUND */}
       {filteredEvents.length === 0 && (
         <div className="no-events">
           <h3>No events found</h3>
-          <p>Try another search or select a different category.</p>
+          <p>
+            Try another search or select a different category.
+          </p>
         </div>
       )}
-
     </div>
   );
 }

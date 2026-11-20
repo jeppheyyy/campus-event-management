@@ -9,6 +9,13 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
 
+    studentId: {
+      type: String,
+      trim: true,
+      unique: true,
+      sparse: true,
+    },
+
     email: {
       type: String,
       required: true,

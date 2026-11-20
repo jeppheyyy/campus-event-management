@@ -6,18 +6,26 @@ const User = require("../models/User");
 
 const router = express.Router();
 
+
 // STUDENT REGISTRATION
 router.post("/register", async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, studentId, email, password } = req.body;
 
-    if (!name || !email || !password) {
+    // CHECK REQUIRED FIELDS
+    if (
+      !name?.trim() ||
+      !studentId?.trim() ||
+      !email?.trim() ||
+      !password
+    ) {
       return res.status(400).json({
         success: false,
         message: "Please complete all fields.",
       });
     }
 
+    // VALIDATE PASSWORD
     if (password.length < 6) {
       return res.status(400).json({
         success: false,
@@ -25,22 +33,35 @@ router.post("/register", async (req, res) => {
       });
     }
 
+    const normalizedEmail = email.toLowerCase().trim();
+    const normalizedStudentId = studentId.trim();
+
+    // CHECK EXISTING EMAIL OR STUDENT ID
     const existingUser = await User.findOne({
-      email: email.toLowerCase().trim(),
+      $or: [
+        { email: normalizedEmail },
+        { studentId: normalizedStudentId },
+      ],
     });
 
     if (existingUser) {
       return res.status(409).json({
         success: false,
-        message: "Email is already registered.",
+        message:
+          existingUser.email === normalizedEmail
+            ? "Email is already registered."
+            : "Student ID is already registered.",
       });
     }
 
+    // HASH PASSWORD
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // CREATE STUDENT ACCOUNT
     const newUser = new User({
-      name,
-      email,
+      name: name.trim(),
+      studentId: normalizedStudentId,
+      email: normalizedEmail,
       password: hashedPassword,
       role: "student",
     });
@@ -53,13 +74,22 @@ router.post("/register", async (req, res) => {
     });
 
   } catch (error) {
+    console.error("STUDENT REGISTRATION ERROR:", error);
+
+    if (error.code === 11000) {
+      return res.status(409).json({
+        success: false,
+        message: "Email or Student ID is already registered.",
+      });
+    }
+
     res.status(500).json({
       success: false,
       message: "Registration failed.",
-      error: error.message,
     });
   }
 });
+
 
 // USER LOGIN
 router.post("/login", async (req, res) => {
@@ -105,17 +135,18 @@ router.post("/login", async (req, res) => {
       { expiresIn: "1d" }
     );
 
-    res.json({
-      success: true,
-      message: "Login successful.",
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-      },
-    });
+res.json({
+  success: true,
+  message: "Login successful.",
+  token,
+  user: {
+    id: user._id,
+    name: user.name,
+    studentId: user.studentId,
+    email: user.email,
+    role: user.role,
+  },
+});
 
   } catch (error) {
     res.status(500).json({

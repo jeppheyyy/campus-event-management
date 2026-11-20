@@ -4,6 +4,7 @@ import "./App.css";
 import BrowseEvents from "./BrowseEvents";
 import MyRegistrations from "./MyRegistrations";
 import AdminDashboard from "./AdminDashboard";
+import StudentRegister from "./StudentRegister";
 
 const API_URL = "http://localhost:5000/api";
 
@@ -34,6 +35,8 @@ function App() {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showRegister, setShowRegister] = useState(false);
+  const [showAccountDetails, setShowAccountDetails] = useState(false);
 
   // COUNT UPCOMING EVENTS
   const today = new Date();
@@ -151,6 +154,14 @@ function App() {
 
   // LOGIN PAGE
   if (!isLoggedIn) {
+    if (showRegister) {
+  return (
+    <StudentRegister
+      onBackToLogin={() => setShowRegister(false)}
+    />
+  );
+}
+
     return (
       <div className="login-container">
         <div className="login-card">
@@ -189,6 +200,23 @@ function App() {
               {loading ? "Signing In..." : "Sign In"}
             </button>
           </form>
+
+          <p style={{ textAlign: "center", marginTop: "20px" }}>
+  Don't have an account?{" "}
+  <button
+    type="button"
+    onClick={() => setShowRegister(true)}
+    style={{
+      background: "none",
+      border: "none",
+      color: "#6558d9",
+      cursor: "pointer",
+      fontWeight: "bold",
+    }}
+  >
+    Create Account
+  </button>
+</p>
 
           <p className="footer-text">
             © 2026 Campus Events. All rights reserved.
@@ -299,21 +327,87 @@ function App() {
               </p>
             </div>
 
-            <div className="student-profile">
-              <div className="profile-avatar">
-                {user?.name?.charAt(0).toUpperCase() || "S"}
-              </div>
+          <button
+            type="button"
+            className="student-profile"
+            onClick={() => setShowAccountDetails(true)}
+          >
+          <div className="profile-avatar">
+            {user?.name?.charAt(0).toUpperCase() || "S"}
+          </div>
 
-              <div>
-                <strong>{user?.name || "Student"}</strong>
+            <div className="profile-info">
+              <strong>{user?.name || "Student"}</strong>
                 <small>
-                  {user?.role === "admin"
-                    ? "Admin Account"
-                    : "Student Account"}
-                </small>
-              </div>
+                {user?.role === "admin"
+                ? "Admin Account"
+                : "Student Account"}
+              </small>
             </div>
+          </button>
           </header>
+
+          {/* ACCOUNT DETAILS MODAL */}
+{showAccountDetails && (
+  <div className="account-modal-overlay">
+    <div className="account-modal">
+      <div className="account-modal-header">
+        <h2>My Account</h2>
+
+        <button
+          type="button"
+          className="account-close-btn"
+          onClick={() => setShowAccountDetails(false)}
+        >
+          &times;
+        </button>
+      </div>
+
+      <div className="account-modal-profile">
+        <div className="account-large-avatar">
+          {user?.name?.charAt(0).toUpperCase() || "S"}
+        </div>
+
+        <h3>{user?.name || "Student"}</h3>
+        <p>
+          {user?.role === "admin" ? "Administrator" : "Student"}
+        </p>
+      </div>
+
+      <div className="account-details-list">
+        <div className="account-detail-item">
+          <span>Full Name</span>
+          <strong>{user?.name || "Not available"}</strong>
+        </div>
+
+        <div className="account-detail-item">
+          <span>Student ID</span>
+          <strong>{user?.studentId || "Not available"}</strong>
+        </div>
+
+        <div className="account-detail-item">
+          <span>Email Address</span>
+          <strong>{user?.email || "Not available"}</strong>
+        </div>
+
+        <div className="account-detail-item">
+          <span>Account Type</span>
+          <strong>
+            {user?.role === "admin" ? "Administrator" : "Student"}
+          </strong>
+        </div>
+      </div>
+
+      <button
+        type="button"
+        className="account-done-btn"
+        onClick={() => setShowAccountDetails(false)}
+      >
+        Close
+      </button>
+    </div>
+  </div>
+)}
 
           {/* WELCOME SECTION */}
           <section className="welcome-section">
