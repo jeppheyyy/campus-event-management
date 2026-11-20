@@ -1530,3 +1530,132 @@
     min-height: 125px;
   }
 }
+/* =================================
+   ADDITIONAL RESPONSIVE IMPROVEMENTS
+================================= */
+
+/* TABLET */
+@media (min-width: 751px) and (max-width: 1000px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-form-grid {
+    gap: 15px;
+  }
+}
+
+/* SMALL SCREENS */
+@media (max-width: 750px) {
+  .dashboard-container {
+    min-height: 100vh;
+  }
+
+  .sidebar {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .sidebar-nav {
+    gap: 6px;
+  }
+
+  .sidebar-nav a {
+    padding: 10px;
+    font-size: 13px;
+  }
+
+  .dashboard-main {
+    padding: 18px;
+  }
+
+  .welcome-section {
+    padding: 22px;
+    gap: 15px;
+  }
+
+  .welcome-icon {
+    font-size: 40px;
+  }
+
+  .admin-form-section,
+  .admin-events-section {
+    padding: 20px;
+  }
+
+  .admin-form-actions {
+    flex-wrap: wrap;
+  }
+
+  .admin-event-actions button {
+    flex: 1;
+  }
+
+  .attendance-table {
+    min-width: 620px;
+  }
+
+  .attendance-table-wrapper {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+/* VERY SMALL MOBILE SCREENS */
+@media (max-width: 480px) {
+  .dashboard-main {
+    padding: 14px;
+  }
+
+  .dashboard-header h1 {
+    font-size: 21px;
+  }
+
+  .welcome-section {
+    padding: 18px;
+  }
+
+  .welcome-section h2 {
+    font-size: 18px;
+  }
+
+  .welcome-icon {
+    font-size: 32px;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .stat-card {
+    padding: 18px;
+  }
+
+  .section-header {
+    align-items: flex-start;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .admin-form-section,
+  .admin-events-section {
+    padding: 16px;
+  }
+
+  .admin-form-actions button {
+    flex: 1;
+  }
+
+  .attendance-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .login-card {
+    padding: 28px 22px;
+  }
+
+  .account-modal {
+    padding: 22px;
+  }
+}
