@@ -84,7 +84,7 @@ const handleSubmit = async (e) => {
     setEditingId(event.id);
     setTitle(event.title);
     setCategory(event.category);
-    setDate(event.date);
+    setDate(event.date ? String(event.date).slice(0, 10) : "");
     setTime(event.time);
     setLocation(event.location);
     setDescription(event.description);
@@ -172,15 +172,14 @@ const handleDelete = async (eventId) => {
       </select>
     </div>
 
-    <div className="admin-form-group">
-      <label>Date</label>
-      <input
-        type="text"
-        value={date}
-        onChange={(e) => setDate(e.target.value)}
-        placeholder="Example: December 15, 2026"
-      />
-    </div>
+<div className="admin-form-group">
+  <label>Date</label>
+  <input
+    type="date"
+    value={date}
+    onChange={(e) => setDate(e.target.value)}
+  />
+</div>
 
     <div className="admin-form-group">
       <label>Time</label>

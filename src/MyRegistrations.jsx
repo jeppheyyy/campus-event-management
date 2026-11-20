@@ -2,6 +2,17 @@
 import { useEffect, useState } from "react";
 
 const API_URL = "http://localhost:5000/api";
+const isPastEvent = (date) => {
+  if (!date) return false;
+
+  const eventDate = new Date(date);
+  const today = new Date();
+
+  eventDate.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
+
+  return eventDate < today;
+};
 
 function MyRegistrations({ setRegisteredEvents, token }) {
   const [registrations, setRegistrations] = useState([]);
@@ -112,12 +123,14 @@ function MyRegistrations({ setRegisteredEvents, token }) {
   }
 
   // GET EVENT DETAILS FROM REGISTRATION RECORDS
-  const myEvents = registrations
-    .filter((registration) => registration.event)
-    .map((registration) => ({
-      ...registration.event,
-      registrationId: registration._id,
-    }));
+	const myEvents = registrations
+  	.filter((registration) => registration.event)
+  	.map((registration) => ({
+    	...registration.event,
+    	registrationId: registration._id,
+    	attendanceStatus: registration.attendanceStatus,
+    	registrationDate: registration.registeredAt,
+  	}));
 
   return (
     <div className="my-registrations">
@@ -156,6 +169,19 @@ function MyRegistrations({ setRegisteredEvents, token }) {
 
                 <p>{event.description}</p>
 
+                <div className="registration-status">
+                  <p>
+                    **Attendance:** {event.attendanceStatus || "Not Marked"}
+                  </p>
+
+                  <p>
+                    **Event Status:**{" "}
+                    {isPastEvent(event.date)
+                      ? "Event Passed"
+                      : event.status || "Open"}
+                  </p>
+                </div>
+
                 <div className="browse-info">
                   <span>
                     📅{" "}
@@ -167,14 +193,16 @@ function MyRegistrations({ setRegisteredEvents, token }) {
                   <span>📍 {event.location}</span>
                 </div>
 
-                <button
-                  className="registered-button"
-                  onClick={() =>
-                    handleCancel(event.registrationId)
-                  }
-                >
-                  Cancel Registration
-                </button>
+            {!isPastEvent(event.date) && (
+              <button
+                className="registered-button"
+                onClick={() =>
+                  handleCancel(event.registrationId)
+                }
+              >
+                Cancel Registration
+              </button>
+            )}
               </div>
             </div>
           ))}

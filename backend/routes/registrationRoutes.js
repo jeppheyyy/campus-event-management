@@ -34,6 +34,19 @@ router.post("/", protect, async (req, res) => {
         message: "Event not found.",
       });
     }
+    // PREVENT REGISTRATION FOR PAST EVENTS
+	const today = new Date();
+	today.setHours(0, 0, 0, 0);
+
+	const eventDate = new Date(event.date);
+	eventDate.setHours(0, 0, 0, 0);
+
+	if (eventDate < today) {
+  		return res.status(400).json({
+    		success: false,
+    		message: "Registration is closed because this event has already passed.",
+  	});
+	}
 
     if (event.status !== "Open") {
       return res.status(400).json({

@@ -643,6 +643,27 @@
 
 /* EVENT INFORMATION */
 
+/* REGISTRATION AND ATTENDANCE STATUS */
+
+.registration-status {
+  background: #f5f4ff;
+  border: 1px solid #e5e2ff;
+  border-radius: 8px;
+  padding: 10px 12px;
+  margin: 15px 0;
+}
+
+.registration-status p {
+  font-size: 12px;
+  color: #555;
+  margin: 5px 0;
+  line-height: 1.5;
+}
+
+.registration-status strong {
+  color: #5145c4;
+}
+
 .browse-card-content {
   padding: 20px;
 }

@@ -1,6 +1,15 @@
 import { useState } from "react";
 
 const API_URL = "http://localhost:5000/api";
+const isPastEvent = (date) => {
+  const eventDate = new Date(date);
+  const today = new Date();
+
+  eventDate.setHours(0, 0, 0, 0);
+  today.setHours(0, 0, 0, 0);
+
+  return eventDate < today;
+};
 
 function BrowseEvents({ events, registeredEvents, setRegisteredEvents, token }) {
   const [search, setSearch] = useState("");
@@ -16,15 +25,23 @@ function BrowseEvents({ events, registeredEvents, setRegisteredEvents, token }) 
     "Academic",
   ];
 
-  const filteredEvents = events.filter((event) => {
-    const matchesSearch =
-      event.title.toLowerCase().includes(search.toLowerCase());
+const filteredEvents = events.filter((event) => {
+  const searchText = search.toLowerCase().trim();
 
-    const matchesCategory =
-      category === "All" || event.category === category;
+  const matchesSearch = [
+    event.title,
+    event.description,
+    event.category,
+    event.location,
+  ].some((value) =>
+    String(value || "").toLowerCase().includes(searchText)
+  );
 
-    return matchesSearch && matchesCategory;
-  });
+  const matchesCategory =
+    category === "All" || event.category === category;
+
+  return matchesSearch && matchesCategory;
+});
 
 
 const handleRegistration = async (eventId) => {
@@ -110,11 +127,14 @@ const handleRegistration = async (eventId) => {
         {filteredEvents.map((event) => (
           <div className="browse-card" key={event.id}>
 
-            <div className="browse-banner">
-              <span>{event.category}</span>
-              <div>🎓</div>
-            </div>
+	<div className="browse-banner">
+  	<span>{event.category}</span>
+  	<div>ðŸŽ“</div>
 
+  	{isPastEvent(event.date) && (
+    	<span className="event-status">Event Passed</span>
+  	)}
+	</div>
             <div className="browse-card-content">
 
               <h3>{event.title}</h3>
@@ -127,19 +147,27 @@ const handleRegistration = async (eventId) => {
                 <span>📍 {event.location}</span>
               </div>
 
-              <button
-                className={
-                  registeredEvents.includes(event.id)
-                    ? "registered-button"
-                    : "register-button"
-                  }
-                onClick={() => handleRegistration(event.id)}
-                disabled={registeredEvents.includes(event.id)}
+<button
+  className={
+    registeredEvents.includes(event.id)
+      ? "registered-button"
+      : "register-button"
+  }
+  onClick={() => handleRegistration(event.id)}
+  disabled={
+    registeredEvents.includes(event.id) ||
+    isPastEvent(event.date) ||
+    event.status !== "Open"
+  }
 >
-                {registeredEvents.includes(event.id)
-                  ? "✓ Registered"
-                  : "Register Now"}
-              </button>
+  {registeredEvents.includes(event.id)
+    ? "Registered"
+    : isPastEvent(event.date)
+      ? "Event Passed"
+      : event.status !== "Open"
+        ? "Registration Closed"
+        : "Register Now"}
+</button>
 
             </div>
 
